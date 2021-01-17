@@ -60,29 +60,56 @@ public class SudokuGenerator {
         boolean stillValid = true;
         boolean continueRemovingCells = true;
         int candidatesRemoved = 0;
+        int candidateRemovalAttempts = 0;
+        
         PuzzleResults checkPuzzleResults = null;
         List<String> generatedPuzzle = results.getResults().get(0);
 
-        while (stillValid && continueRemovingCells && candidatesRemoved < candidatesToRemove) {
+        while (stillValid && continueRemovingCells && candidatesRemoved < candidatesToRemove 
+                    && candidateRemovalAttempts < 10) {
             int row = new Random().nextInt(9);
             int col = new Random().nextInt(9);
-            // is there a number still in this post?
-            generatedPuzzle = this.removeCandidateFromPosition(row, col, generatedPuzzle);
-            candidatesRemoved++;
-            // check the puzzle is valid, if still valid, continue
-            solver = new SudokuSolverWithDLX();
-            checkPuzzleResults = solver.run(generatedPuzzle, 1);
-            stillValid = checkPuzzleResults.isValidPuzzle();
-            
-            //TODO increment the count if the puzzle is still valid and we can try the next removal, otherwise put the value vack
-            if(stillValid) {
-                
+            // is there a number still in this position?
+            char candidateValueToRemove = this.getCandidateFromPosition(row, col, generatedPuzzle);
+            if (candidateValueToRemove != '.') {
+                generatedPuzzle = this.removeCandidateFromPosition(row, col, generatedPuzzle);
+
+                // check the puzzle is valid, if still valid, continue
+                solver = new SudokuSolverWithDLX();
+                checkPuzzleResults = solver.run(generatedPuzzle, 1);
+                stillValid = checkPuzzleResults.isValidPuzzle();
+
+                // increment the count if the puzzle is still valid and we can
+                // try the next removal, otherwise put the value vack
+                if (stillValid) {
+                    candidatesRemoved++;
+                    candidateRemovalAttempts = 0;
+                } else {
+                    candidateRemovalAttempts++;
+                    
+                    //put back original into cell
+                    this.setCandidateInPosition(row, col, candidateValueToRemove);
+                }
             }
         }
 
         //TODO: if not valid, need to backtrack or start again
         results.getResults().set(0, generatedPuzzle);
         return results;
+    }
+
+    private void setCandidateInPosition(int row, int col, char candidateValueToRemove) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    private char getCandidateFromPosition(int row, int col, List<String> puzzle) {
+        //get row
+        char candidateToReturn;
+        String currentRow = puzzle.get(row);
+        char[] values = currentRow.toCharArray();
+        candidateToReturn = values[col];
+        return candidateToReturn;
     }
 
     List<String> removeCandidateFromPosition(int row, int col, List<String> puzzle) {
