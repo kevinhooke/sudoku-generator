@@ -1,10 +1,14 @@
-package kh.sudoku;
+package kh.sudoku.generator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+
+import kh.sudoku.PuzzleResults;
+import kh.sudoku.SudokuSolverWithDLX;
+import kh.sudokugrader.InvalidPuzzleException;
 
 /**
  * Sudoku puzzle generator. Uses kh.sudoku.SudokuSolverWithDLX to check for
@@ -34,6 +38,7 @@ public class SudokuGenerator {
      * 
      * @return generated puzzle
      */
+    //TODO this should really change to number of givens because thats what we're interested in, not how many where removed
     public PuzzleResults generate(int candidatesToRemove) {
 
         if(candidatesToRemove < 1 || candidatesToRemove > 64) {
@@ -60,13 +65,19 @@ public class SudokuGenerator {
         boolean stillValid = true;
         boolean continueRemovingCells = true;
         int candidatesRemoved = 0;
+        
+        //if puzzle is valid, removal attempts is 0
         int candidateRemovalAttempts = 0;
+        
+        //tracks the maximum number of attempts to remove a value before a valid puzzle was generated
+        int maxCandidateRemovalAttempts = 0;
         
         PuzzleResults checkPuzzleResults = null;
         List<String> generatedPuzzle = results.getResults().get(0);
 
-        while (stillValid && continueRemovingCells && candidatesRemoved < candidatesToRemove 
-                    && candidateRemovalAttempts < 10) {
+        //stillValid
+        while (continueRemovingCells && candidatesRemoved < candidatesToRemove 
+                    && candidateRemovalAttempts < 1000) {
             int row = new Random().nextInt(9);
             int col = new Random().nextInt(9);
             // is there a number still in this position?
@@ -76,31 +87,57 @@ public class SudokuGenerator {
 
                 // check the puzzle is valid, if still valid, continue
                 solver = new SudokuSolverWithDLX();
-                checkPuzzleResults = solver.run(generatedPuzzle, 1);
-                stillValid = checkPuzzleResults.isValidPuzzle();
+                
+                //need to look for more than 1 solution because we need to check there is only 1 to be valid
+                checkPuzzleResults = solver.run(generatedPuzzle, 2);
+                if(checkPuzzleResults.getResults().size() == 1) {
+                    System.out.println("*** Only one solution, puzzle is valid");
+
+                    try {
+                        stillValid = checkPuzzleResults.isValidPuzzle();
+                    }
+                    catch(Exception ipe) {
+                        stillValid = false;
+                    }
+                }
+                else {
+                    stillValid = false;
+                }
+
 
                 // increment the count if the puzzle is still valid and we can
-                // try the next removal, otherwise put the value vack
+                // try the next removal, otherwise put the value back
                 if (stillValid) {
                     candidatesRemoved++;
                     candidateRemovalAttempts = 0;
                 } else {
                     candidateRemovalAttempts++;
+                    maxCandidateRemovalAttempts++;
                     
                     //put back original into cell
-                    this.setCandidateInPosition(row, col, candidateValueToRemove);
+                    String updatedRow = this.setCandidateInPosition(row, col, candidateValueToRemove, generatedPuzzle);
+                    generatedPuzzle.set(row, updatedRow);
                 }
             }
         }
 
+        System.out.println("*** Removal attempts: " + candidateRemovalAttempts);
+        
         //TODO: if not valid, need to backtrack or start again
+        results.setMaxCandidateRemovalAttempts(maxCandidateRemovalAttempts);
         results.getResults().set(0, generatedPuzzle);
         return results;
     }
 
-    private void setCandidateInPosition(int row, int col, char candidateValueToRemove) {
-        // TODO Auto-generated method stub
+    private String setCandidateInPosition(int row, int col, char candidateValueToReplace, List<String> puzzle) {
+
+        String currentRow = puzzle.get(row);
+        char[] values = currentRow.toCharArray();
+        values[col] = candidateValueToReplace;
         
+        //TODO set back into list
+        String updatedRow = new String(values);
+        return updatedRow;
     }
 
     private char getCandidateFromPosition(int row, int col, List<String> puzzle) {

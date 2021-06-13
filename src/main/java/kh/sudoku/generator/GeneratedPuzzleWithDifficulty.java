@@ -1,5 +1,6 @@
-package kh.sudoku;
+package kh.sudoku.generator;
 
+import kh.sudoku.PuzzleResults;
 import kh.sudokugrader.PuzzleDifficulty;
 
 public class GeneratedPuzzleWithDifficulty {
