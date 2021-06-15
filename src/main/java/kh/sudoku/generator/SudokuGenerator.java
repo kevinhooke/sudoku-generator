@@ -39,94 +39,98 @@ public class SudokuGenerator {
      * @return generated puzzle
      */
     //TODO this should really change to number of givens because thats what we're interested in, not how many where removed
-    public PuzzleResults generate(int candidatesToRemove) {
+    public List<PuzzleResults> generate(int candidatesToRemove, int puzzlesToGenerate) {
 
         if(candidatesToRemove < 1 || candidatesToRemove > 64) {
             throw new InvalidCandiatesToRemoveException();
         }
+        List<PuzzleResults> generatedPuzzles = new ArrayList<>();
         
         SudokuSolverWithDLX solver = new SudokuSolverWithDLX();
-        // create seed for starting final solution
-        List<String> givenSolutionsShorthand = new ArrayList<>();
-        givenSolutionsShorthand.add(this.generateRandomSeedString());
-        givenSolutionsShorthand.add(".........");
-        givenSolutionsShorthand.add(".........");
-        givenSolutionsShorthand.add(".........");
-        givenSolutionsShorthand.add(".........");
-        givenSolutionsShorthand.add(".........");
-        givenSolutionsShorthand.add(".........");
-        givenSolutionsShorthand.add(".........");
-        givenSolutionsShorthand.add(".........");
         
-        //TODO: this was a prior approach, but switch to generating a completed grid then remove candidates
-        PuzzleResults results = solver.run(givenSolutionsShorthand, 1);
-        
-        // initial givens to remove (up to 64, leaving min of 17)
-        boolean stillValid = true;
-        boolean continueRemovingCells = true;
-        int candidatesRemoved = 0;
-        
-        //if puzzle is valid, removal attempts is 0
-        int candidateRemovalAttempts = 0;
-        
-        //tracks the maximum number of attempts to remove a value before a valid puzzle was generated
-        int maxCandidateRemovalAttempts = 0;
-        
-        PuzzleResults checkPuzzleResults = null;
-        List<String> generatedPuzzle = results.getResults().get(0);
-
-        //stillValid
-        while (continueRemovingCells && candidatesRemoved < candidatesToRemove 
-                    && candidateRemovalAttempts < 1000) {
-            int row = new Random().nextInt(9);
-            int col = new Random().nextInt(9);
-            // is there a number still in this position?
-            char candidateValueToRemove = this.getCandidateFromPosition(row, col, generatedPuzzle);
-            if (candidateValueToRemove != '.') {
-                generatedPuzzle = this.removeCandidateFromPosition(row, col, generatedPuzzle);
-
-                // check the puzzle is valid, if still valid, continue
-                solver = new SudokuSolverWithDLX();
-                
-                //need to look for more than 1 solution because we need to check there is only 1 to be valid
-                checkPuzzleResults = solver.run(generatedPuzzle, 2);
-                if(checkPuzzleResults.getResults().size() == 1) {
-                    System.out.println("*** Only one solution, puzzle is valid");
-
-                    try {
-                        stillValid = checkPuzzleResults.isValidPuzzle();
+        for(int count = 0; count < puzzlesToGenerate; count++) {
+            // create seed for starting final solution
+            List<String> givenSolutionsShorthand = new ArrayList<>();
+            givenSolutionsShorthand.add(this.generateRandomSeedString());
+            givenSolutionsShorthand.add(".........");
+            givenSolutionsShorthand.add(".........");
+            givenSolutionsShorthand.add(".........");
+            givenSolutionsShorthand.add(".........");
+            givenSolutionsShorthand.add(".........");
+            givenSolutionsShorthand.add(".........");
+            givenSolutionsShorthand.add(".........");
+            givenSolutionsShorthand.add(".........");
+            
+            PuzzleResults puzzle = solver.run(givenSolutionsShorthand, 1);
+            
+            boolean stillValid = true;
+            boolean continueRemovingCells = true;
+            int candidatesRemoved = 0;
+            
+            //if puzzle is valid, removal attempts is 0
+            int candidateRemovalAttempts = 0;
+            
+            //tracks the maximum number of attempts to remove a value before a valid puzzle was generated
+            int maxCandidateRemovalAttempts = 0;
+            
+            PuzzleResults checkPuzzleResults = null;
+            List<String> generatedPuzzle = puzzle.getResults().get(0);
+    
+            //stillValid
+            while (continueRemovingCells && candidatesRemoved < candidatesToRemove 
+                        && candidateRemovalAttempts < 1000) {
+                int row = new Random().nextInt(9);
+                int col = new Random().nextInt(9);
+                // is there a number still in this position?
+                char candidateValueToRemove = this.getCandidateFromPosition(row, col, generatedPuzzle);
+                if (candidateValueToRemove != '.') {
+                    generatedPuzzle = this.removeCandidateFromPosition(row, col, generatedPuzzle);
+    
+                    // check the puzzle is valid, if still valid, continue
+                    solver = new SudokuSolverWithDLX();
+                    
+                    //need to look for more than 1 solution because we need to check there is only 1 to be valid
+                    checkPuzzleResults = solver.run(generatedPuzzle, 2);
+                    if(checkPuzzleResults.getResults().size() == 1) {
+                        System.out.println("*** Only one solution, puzzle is valid");
+    
+                        try {
+                            stillValid = checkPuzzleResults.isValidPuzzle();
+                        }
+                        catch(Exception ipe) {
+                            stillValid = false;
+                        }
                     }
-                    catch(Exception ipe) {
+                    else {
                         stillValid = false;
                     }
-                }
-                else {
-                    stillValid = false;
-                }
-
-
-                // increment the count if the puzzle is still valid and we can
-                // try the next removal, otherwise put the value back
-                if (stillValid) {
-                    candidatesRemoved++;
-                    candidateRemovalAttempts = 0;
-                } else {
-                    candidateRemovalAttempts++;
-                    maxCandidateRemovalAttempts++;
-                    
-                    //put back original into cell
-                    String updatedRow = this.setCandidateInPosition(row, col, candidateValueToRemove, generatedPuzzle);
-                    generatedPuzzle.set(row, updatedRow);
+    
+    
+                    // increment the count if the puzzle is still valid and we can
+                    // try the next removal, otherwise put the value back
+                    if (stillValid) {
+                        candidatesRemoved++;
+                        candidateRemovalAttempts = 0;
+                    } else {
+                        candidateRemovalAttempts++;
+                        maxCandidateRemovalAttempts++;
+                        
+                        //put back original into cell
+                        String updatedRow = this.setCandidateInPosition(row, col, candidateValueToRemove, generatedPuzzle);
+                        generatedPuzzle.set(row, updatedRow);
+                    }
                 }
             }
+    
+            System.out.println("*** Removal attempts: " + candidateRemovalAttempts);
+            
+            //TODO: if not valid, need to backtrack or start again
+            puzzle.setMaxCandidateRemovalAttempts(maxCandidateRemovalAttempts);
+            puzzle.getResults().set(0, generatedPuzzle);
+            
+            generatedPuzzles.add(puzzle);
         }
-
-        System.out.println("*** Removal attempts: " + candidateRemovalAttempts);
-        
-        //TODO: if not valid, need to backtrack or start again
-        results.setMaxCandidateRemovalAttempts(maxCandidateRemovalAttempts);
-        results.getResults().set(0, generatedPuzzle);
-        return results;
+        return generatedPuzzles;
     }
 
     private String setCandidateInPosition(int row, int col, char candidateValueToReplace, List<String> puzzle) {

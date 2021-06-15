@@ -28,13 +28,13 @@ public class SudokuGeneratorTest {
     @Test(expected = InvalidCandiatesToRemoveException.class)
     public void testInvalidArgument0() {
         SudokuGenerator generator = new SudokuGenerator();
-        generator.generate(0);
+        generator.generate(0, 1);
     }
 
     @Test(expected = InvalidCandiatesToRemoveException.class)
     public void testInvalidArgument65() {
         SudokuGenerator generator = new SudokuGenerator();
-        generator.generate(65);
+        generator.generate(65, 1);
     }
 
     @Test
@@ -87,9 +87,11 @@ public class SudokuGeneratorTest {
     public void testGenerate1() {
         SudokuGenerator generator = new SudokuGenerator();
 
-        PuzzleResults results = generator.generate(1);
+        List<PuzzleResults> results = generator.generate(1, 1);
 
-        List<List<String>> generatedPuzzles = results.getResults();
+        assertEquals(1, results.size());
+        
+        List<List<String>> generatedPuzzles = results.get(0).getResults();
         for (List<String> shorthand : generatedPuzzles) {
             System.out.println(shorthand);
         }
@@ -108,10 +110,10 @@ public class SudokuGeneratorTest {
         assertNotNull(difficulty);
 
         // further asserts
-        int expectedNumberOfGivens = (9 * 9) - 50;
+        int expectedNumberOfGivens = (9 * 9) - 1;
         assertEquals(expectedNumberOfGivens, difficulty.getInitialGivens());
 
-        assertTrue(results.isValidPuzzle());
+        assertTrue(results.get(0).isValidPuzzle());
     }
 
     /**
@@ -122,9 +124,9 @@ public class SudokuGeneratorTest {
     public void testGenerate10() {
         SudokuGenerator generator = new SudokuGenerator();
 
-        PuzzleResults results = generator.generate(10);
+        List<PuzzleResults> results = generator.generate(10, 1);
 
-        List<List<String>> generatedPuzzles = results.getResults();
+        List<List<String>> generatedPuzzles = results.get(0).getResults();
         for (List<String> shorthand : generatedPuzzles) {
             System.out.println(shorthand);
         }
@@ -146,7 +148,7 @@ public class SudokuGeneratorTest {
         int expectedNumberOfGivens = (9 * 9) - 10;
         assertEquals(expectedNumberOfGivens, difficulty.getInitialGivens());
 
-        assertTrue(results.isValidPuzzle());
+        assertTrue(results.get(0).isValidPuzzle());
     }
 
     /**
@@ -157,9 +159,9 @@ public class SudokuGeneratorTest {
     public void testGenerate30() {
         SudokuGenerator generator = new SudokuGenerator();
 
-        PuzzleResults results = generator.generate(30);
+        List<PuzzleResults> results = generator.generate(30, 1);
 
-        List<List<String>> generatedPuzzles = results.getResults();
+        List<List<String>> generatedPuzzles = results.get(0).getResults();
         for (List<String> shorthand : generatedPuzzles) {
             System.out.println(shorthand);
         }
@@ -181,7 +183,7 @@ public class SudokuGeneratorTest {
         int expectedNumberOfGivens = (9 * 9) - 30;
         assertEquals(expectedNumberOfGivens, difficulty.getInitialGivens());
 
-        assertTrue(results.isValidPuzzle());
+        assertTrue(results.get(0).isValidPuzzle());
     }
 
     /**
@@ -192,9 +194,9 @@ public class SudokuGeneratorTest {
     public void testGenerate40() {
         SudokuGenerator generator = new SudokuGenerator();
 
-        PuzzleResults results = generator.generate(40);
+        List<PuzzleResults> results = generator.generate(40, 1);
 
-        List<List<String>> generatedPuzzles = results.getResults();
+        List<List<String>> generatedPuzzles = results.get(0).getResults();
         for (List<String> shorthand : generatedPuzzles) {
             System.out.println(shorthand);
         }
@@ -216,7 +218,7 @@ public class SudokuGeneratorTest {
         int expectedNumberOfGivens = (9 * 9) - 40;
         assertEquals(expectedNumberOfGivens, difficulty.getInitialGivens());
 
-        assertTrue(results.isValidPuzzle());
+        assertTrue(results.get(0).isValidPuzzle());
     }
 
     /**
@@ -227,9 +229,9 @@ public class SudokuGeneratorTest {
     public void testGenerate50() {
         SudokuGenerator generator = new SudokuGenerator();
 
-        PuzzleResults results = generator.generate(50);
+        List<PuzzleResults> results = generator.generate(50, 1);
 
-        List<List<String>> generatedPuzzles = results.getResults();
+        List<List<String>> generatedPuzzles = results.get(0).getResults();
         for (List<String> shorthand : generatedPuzzles) {
             System.out.println(shorthand);
         }
@@ -251,7 +253,7 @@ public class SudokuGeneratorTest {
         int expectedNumberOfGivens = (9 * 9) - 50;
         assertEquals(expectedNumberOfGivens, difficulty.getInitialGivens());
 
-        assertTrue(results.isValidPuzzle());
+        assertTrue(results.get(0).isValidPuzzle());
     }
 
     /**
@@ -262,9 +264,9 @@ public class SudokuGeneratorTest {
     public void testGenerate60() {
         SudokuGenerator generator = new SudokuGenerator();
 
-        PuzzleResults results = generator.generate(60);
+        List<PuzzleResults> results = generator.generate(60, 1);
 
-        List<List<String>> generatedPuzzles = results.getResults();
+        List<List<String>> generatedPuzzles = results.get(0).getResults();
         for (List<String> shorthand : generatedPuzzles) {
             System.out.println(shorthand);
         }
@@ -282,7 +284,7 @@ public class SudokuGeneratorTest {
         // asserts on the result
         assertNotNull(difficulty);
 
-        assertTrue(results.isValidPuzzle());
+        assertTrue(results.get(0).isValidPuzzle());
         
         // further asserts
         int expectedNumberOfGivens = (9 * 9) - 60;
@@ -299,27 +301,21 @@ public class SudokuGeneratorTest {
 
         List<GeneratedPuzzleWithDifficulty> puzzles = new ArrayList<>();
 
-        for (int i = 0; i < 2; i++) {
-
-            SudokuGenerator generator = new SudokuGenerator();
-
-            PuzzleResults results = generator.generate(81-17);
-
-            List<List<String>> generatedPuzzles = results.getResults();
-            //for (List<String> shorthand : generatedPuzzles) {
-            //    System.out.println(shorthand);
-            //}
-
-            assertTrue(results.isValidPuzzle());
-
+        SudokuGenerator generator = new SudokuGenerator();
+        List<PuzzleResults> results = generator.generate(81-17, 2);
+        for(PuzzleResults puzzle : results) {
+            List<List<String>> generatedPuzzles = puzzle.getResults();
+    
+            assertTrue(results.get(0).isValidPuzzle());
+    
             // grade the puzzle
             SudokuGraderApp grader = new SudokuGraderApp();
-
+    
             // get generated puzzle
             List<String> generatedPuzzle1 = generatedPuzzles.get(0);
             grader.setSudokuGridWithSolutionShorthand(generatedPuzzle1);
             grader.populateSolutionGridWithStartingPosition();
-
+    
             PuzzleDifficulty difficulty = null;
             try {
                 difficulty = grader.gradePuzzle();
@@ -327,12 +323,12 @@ public class SudokuGeneratorTest {
             catch(InvalidPuzzleException ive) {
                 System.out.println("Error: Invalid puzzle");
             }
-
+    
             // further asserts
             //int expectedNumberOfGivens = (9 * 9) - 60;
             //assertEquals(expectedNumberOfGivens, difficulty.getInitialGivens());
-
-            puzzles.add(new GeneratedPuzzleWithDifficulty(results, difficulty));
+    
+            puzzles.add(new GeneratedPuzzleWithDifficulty(puzzle, difficulty));
         }
 
         //TODO bug - puzzle showing as invalid but output during run showing solutions=1
@@ -369,9 +365,9 @@ public class SudokuGeneratorTest {
     public void testGenerate64() {
         SudokuGenerator generator = new SudokuGenerator();
 
-        PuzzleResults results = generator.generate(64);
+        List<PuzzleResults> results = generator.generate(64, 1);
 
-        List<List<String>> generatedPuzzles = results.getResults();
+        List<List<String>> generatedPuzzles = results.get(0).getResults();
         for (List<String> shorthand : generatedPuzzles) {
             System.out.println(shorthand);
         }
@@ -393,6 +389,25 @@ public class SudokuGeneratorTest {
         //int expectedNumberOfGivens = (9 * 9) - 64;
         //assertEquals(expectedNumberOfGivens, difficulty.getInitialGivens());
 
-        assertTrue(results.isValidPuzzle());
+        assertTrue(results.get(0).isValidPuzzle());
+        
+        if(difficulty != null) {
+            System.out.println(results.get(0));
+            System.out.println("Puzzle valid: " + results.get(0).isValidPuzzle()
+                    + ", solved?: " + difficulty.isPuzzleSolved());
+            
+            System.out.println("Difficulty: " + difficulty.getDifficulty());
+            System.out.println("Initial givens: " + difficulty.getInitialGivens());
+            System.out.println("max candidate removal attemps: " + results.get(0).getMaxCandidateRemovalAttempts());
+            System.out.println("Naked singles found: " + difficulty.getNakedSingleCount());
+            System.out.println("Hidden singles found: " + difficulty.getHiddenSingleCount());
+            System.out.println("Naked pairs found: " + difficulty.getNakedPairsCount());
+            
+            System.out.println();
+        }
+        else{
+            System.out.println("Puzzle valid: No, invalid puzzle");
+
+        }
     }
 }
