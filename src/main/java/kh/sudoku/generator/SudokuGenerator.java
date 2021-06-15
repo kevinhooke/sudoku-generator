@@ -9,6 +9,8 @@ import java.util.Random;
 import kh.sudoku.PuzzleResults;
 import kh.sudoku.SudokuSolverWithDLX;
 import kh.sudokugrader.InvalidPuzzleException;
+import kh.sudokugrader.PuzzleDifficulty;
+import kh.sudokugrader.SudokuGraderApp;
 
 /**
  * Sudoku puzzle generator. Uses kh.sudoku.SudokuSolverWithDLX to check for
@@ -31,6 +33,39 @@ public class SudokuGenerator {
         return sb.toString();
     }
 
+    public List<GeneratedPuzzleWithDifficulty> generateGradedPuzzles(int targetGivens, int puzzlesToGenerate){
+        List<GeneratedPuzzleWithDifficulty> puzzles = new ArrayList<>();
+
+        SudokuGenerator generator = new SudokuGenerator();
+        List<PuzzleResults> results = generator.generate(81 - targetGivens, puzzlesToGenerate);
+        for(PuzzleResults puzzle : results) {
+            List<List<String>> generatedPuzzles = puzzle.getResults();
+    
+            //TODO: convert to if check
+            //assertTrue(results.get(0).isValidPuzzle());
+    
+            // grade the puzzle
+            SudokuGraderApp grader = new SudokuGraderApp();
+    
+            // get generated puzzle
+            List<String> generatedPuzzle1 = generatedPuzzles.get(0);
+            grader.setSudokuGridWithSolutionShorthand(generatedPuzzle1);
+            grader.populateSolutionGridWithStartingPosition();
+    
+            PuzzleDifficulty difficulty = null;
+            try {
+                difficulty = grader.gradePuzzle();
+            }
+            catch(InvalidPuzzleException ive) {
+                System.out.println("Error: Invalid puzzle");
+            }
+    
+            puzzles.add(new GeneratedPuzzleWithDifficulty(puzzle, difficulty));
+        }
+        
+        return puzzles;
+    }
+    
     /**
      * Generate new puzzle with specified number of givens removed.
      * 

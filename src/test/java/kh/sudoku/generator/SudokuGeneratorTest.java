@@ -331,8 +331,6 @@ public class SudokuGeneratorTest {
             puzzles.add(new GeneratedPuzzleWithDifficulty(puzzle, difficulty));
         }
 
-        //TODO bug - puzzle showing as invalid but output during run showing solutions=1
-        //I think isValidPuzzle is showing a different result that difficulty.isValid
         for(GeneratedPuzzleWithDifficulty puzzle : puzzles) {
             if(puzzle.getDifficulty() != null) {
                 System.out.println(puzzle.getResults().getResults().get(0));
@@ -410,4 +408,125 @@ public class SudokuGeneratorTest {
 
         }
     }
+    
+    @Test
+    public void testGenerateGradedPuzzles_17Givens_1(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(17, 1);
+        
+        assertEquals(1, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    @Test
+    public void testGenerateGradedPuzzles_18Givens_2(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(18, 2);
+        
+        assertEquals(2, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    @Test
+    public void testGenerateGradedPuzzles_19Givens_2(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(19, 2);
+        
+        assertEquals(2, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    /**
+     * 20 givens gets some MEDIUM difficulty puzzles, but < 20 only gets HARDs
+     */
+    @Test
+    public void testGenerateGradedPuzzles_20Givens_2(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(20, 2);
+        
+        assertEquals(2, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    @Test
+    public void testGenerateGradedPuzzles_21Givens_2(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(21, 2);
+        
+        assertEquals(2, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    @Test
+    public void testGenerateGradedPuzzles_22Givens_2(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(22, 2);
+        
+        assertEquals(2, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    @Test
+    public void testGenerateGradedPuzzles_23Givens_2(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(23, 2);
+        
+        assertEquals(2, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    @Test
+    public void testGenerateGradedPuzzles_24Givens_2(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(24, 2);
+        
+        assertEquals(2, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    //TODO: bug - 25 givens for some reason goes into into a loop
+    //@Test
+    public void testGenerateGradedPuzzles_25Givens_1(){
+        SudokuGenerator generator = new SudokuGenerator();
+        List<GeneratedPuzzleWithDifficulty> puzzles = generator.generateGradedPuzzles(25, 2);
+        
+        assertEquals(2, puzzles.size());
+        
+        this.printGeneratedResults(puzzles);
+    }
+
+    
+    void printGeneratedResults(List<GeneratedPuzzleWithDifficulty> puzzles) {
+        for(GeneratedPuzzleWithDifficulty puzzle : puzzles) {
+            if(puzzle.getDifficulty() != null) {
+                System.out.println();
+                System.out.println(puzzle.getResults().getResults().get(0));
+                System.out.println("Puzzle valid: " + puzzle.getResults().isValidPuzzle()
+                        + ", solved?: " + puzzle.getDifficulty().isPuzzleSolved());
+                
+                System.out.println("Difficulty: " + puzzle.getDifficulty().getDifficulty());
+                System.out.println("Initial givens: " + puzzle.getDifficulty().getInitialGivens());
+                System.out.println("max candidate removal attemps: " + puzzle.getResults().getMaxCandidateRemovalAttempts());
+                System.out.println("Naked singles found: " + puzzle.getDifficulty().getNakedSingleCount());
+                System.out.println("Hidden singles found: " + puzzle.getDifficulty().getHiddenSingleCount());
+                System.out.println("Naked pairs found: " + puzzle.getDifficulty().getNakedPairsCount());
+                
+                System.out.println();
+            }
+            else{
+                System.out.println("Puzzle valid: No, invalid puzzle");
+
+            }
+        }
+
+    }
+    
 }
