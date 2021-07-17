@@ -92,9 +92,9 @@ public class SudokuGeneratorTest {
         assertEquals(1, results.size());
         
         List<List<String>> generatedPuzzles = results.get(0).getResults();
-        for (List<String> shorthand : generatedPuzzles) {
-            System.out.println(shorthand);
-        }
+        //for (List<String> shorthand : generatedPuzzles) {
+        //    System.out.println(shorthand);
+        //}
 
         // grade the puzzle
         SudokuGraderApp grader = new SudokuGraderApp();

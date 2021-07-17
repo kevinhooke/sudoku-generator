@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import kh.sudoku.PuzzleResults;
 import kh.sudoku.SudokuSolverWithDLX;
 import kh.sudokugrader.InvalidPuzzleException;
@@ -21,6 +24,8 @@ import kh.sudokugrader.SudokuGraderApp;
  */
 public class SudokuGenerator {
 
+    private static final Logger LOGGER = LogManager.getLogger();
+    
     public String generateRandomSeedString() {
         List<String> startingList = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9");
         Collections.shuffle(startingList);
@@ -57,7 +62,7 @@ public class SudokuGenerator {
                 difficulty = grader.gradePuzzle();
             }
             catch(InvalidPuzzleException ive) {
-                System.out.println("Error: Invalid puzzle");
+                LOGGER.error("Error: Invalid puzzle");
             }
     
             puzzles.add(new GeneratedPuzzleWithDifficulty(puzzle, difficulty));
@@ -127,7 +132,7 @@ public class SudokuGenerator {
                     //need to look for more than 1 solution because we need to check there is only 1 to be valid
                     checkPuzzleResults = solver.run(generatedPuzzle, 2);
                     if(checkPuzzleResults.getResults().size() == 1) {
-                        System.out.println("*** Only one solution, puzzle is valid");
+                        LOGGER.debug("*** Only one solution, puzzle is valid");
     
                         try {
                             stillValid = checkPuzzleResults.isValidPuzzle();
@@ -157,7 +162,7 @@ public class SudokuGenerator {
                 }
             }
     
-            System.out.println("*** Removal attempts: " + candidateRemovalAttempts);
+            LOGGER.debug("*** Removal attempts: " + candidateRemovalAttempts);
             
             //TODO: if not valid, need to backtrack or start again
             puzzle.setMaxCandidateRemovalAttempts(maxCandidateRemovalAttempts);
